@@ -72,7 +72,6 @@
 				AA6CDCF2297C8C9100781763 /* Assets.xcassets */,
 				AA6CDCF4297C8C9100781763 /* LaunchScreen.storyboard */,
 				AA6CDCF7297C8C9100781763 /* Info.plist */,
-				AA6CDCEF297C8C8F00781763 /* Todoey.xcdatamodeld */,
 			);
 			path = Todoey;
 			sourceTree = "<group>";
@@ -97,6 +96,7 @@
 		AA6CDCFF297C8D9E00781763 /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				AA6CDCEF297C8C8F00781763 /* Todoey.xcdatamodeld */,
 				AA6CDD04297E017600781763 /* ToDoListItem.swift */,
 				AA6CDD06297E020B00781763 /* ToDoList.swift */,
 			);
@@ -334,6 +334,7 @@
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -361,6 +362,7 @@
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",

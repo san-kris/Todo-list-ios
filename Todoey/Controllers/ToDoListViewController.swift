@@ -10,8 +10,16 @@ import CoreData
 
 class ToDoListViewController: UITableViewController{
 
+    
     var toDoList = [ToDoItem]()
     let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
+    
+    var selectedCategory: CategoryItem? {
+        didSet{
+            // this block is executed when variable is set with value
+            loadData()
+        }
+    }
     
     // Not using userDefaults.
     // let userDefaults = UserDefaults()
@@ -35,7 +43,6 @@ class ToDoListViewController: UITableViewController{
             print("No items in user default list")
         }
          */
-        loadData()
     }
     
     override func numberOfSections(in tableView: UITableView) -> Int {
@@ -106,8 +113,12 @@ class ToDoListViewController: UITableViewController{
                 // The class is subclassed from NSManagedObject
                 // each row in Entity / Table is an instance of the class
                 let newItem = ToDoItem(context: self.context)
+                // set the complete flag
                 newItem.done = false
+                // set the title
                 newItem.title = newToDoItem
+                // set the foreign key column
+                newItem.parentCategory = self.selectedCategory
                 self.toDoList.append(newItem)
                 
                 // Add new Item to array
@@ -145,10 +156,19 @@ class ToDoListViewController: UITableViewController{
         self.tableView.reloadData()
     }
 
-    func loadData() -> Void {
+    func loadData(request: NSFetchRequest<ToDoItem> = ToDoItem.fetchRequest(), predicate: NSPredicate? = nil) -> Void {
         do{
-            // create a  fetch request from Entity Type Method
-            let request: NSFetchRequest<ToDoItem> = ToDoItem.fetchRequest()
+            // Create a default predicate
+            let defaultPredicate = NSPredicate(format: "parentCategory.name MATCHES %@", selectedCategory?.name ?? "")
+            // Add the default oredicate to an array
+            var predicateArray = [defaultPredicate]
+            // If function received input add that to predicate array
+            if let newPredicate = predicate{
+                predicateArray.append(newPredicate)
+            }
+            let compoundPredicate = NSCompoundPredicate(andPredicateWithSubpredicates: predicateArray)
+            request.predicate = compoundPredicate
+            
             toDoList = try context.fetch(request)
         } catch {
             print("Error Fetching Item array from SQLITE -  \(error)")
@@ -204,24 +224,14 @@ class ToDoListViewController: UITableViewController{
 extension ToDoListViewController: UISearchBarDelegate{
     
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
-        // create a empty request. similar to select *
-        let request: NSFetchRequest<ToDoItem> = ToDoItem.fetchRequest()
         
         // Add where condition / filters
         let predicate = NSPredicate(format: "title CONTAINS[cd] %@", searchBar.text!)
-        request.predicate = predicate
-        
         // add sorting condition for result
-        let sortDescriptor = NSSortDescriptor(key: "title", ascending: true)
-        request.sortDescriptors = [sortDescriptor]
+        // let sortDescriptor = NSSortDescriptor(key: "title", ascending: true)
+        // request.sortDescriptors = [sortDescriptor]
         
-        // fetch the result
-        do{
-            toDoList = try context.fetch(request)
-        } catch {
-            print("Error Fetching Item array from SQLITE -  \(error)")
-        }
-        
+        loadData(predicate: predicate)
         tableView.reloadData()
 
         print(searchBar.text!)

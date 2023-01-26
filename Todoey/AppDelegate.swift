@@ -7,6 +7,7 @@
 
 import UIKit
 import CoreData
+import RealmSwift
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -18,6 +19,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         // print the path to UserDefaults plist file on device
         // print(NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true))
+        
+        // Realm DB location
+        print(Realm.Configuration.defaultConfiguration.fileURL!)
         
         return true
     }

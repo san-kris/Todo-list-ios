@@ -6,12 +6,24 @@
 //
 
 import UIKit
-import CoreData
+// import CoreData
+import RealmSwift
 
 class CategoryViewController: UITableViewController {
 
-    var toDoCategories = [CategoryItem]()
-    let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
+    // Below lines are used to get contect for CoreData
+    //var toDoCategories = [CategoryItem]()
+    //let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
+    
+    // Obtains an instance of default Realm object
+    // use lazy init when we are migrating / changing data model in Realm DB
+    lazy var realm:Realm = {
+        return try! Realm()
+    }()
+    // declare category list as a Results auto-updating datatype in Realm
+    var toDoCategories: Results<CategoryItemRlm>?
+    var test: String!
+
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -29,7 +41,7 @@ class CategoryViewController: UITableViewController {
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         // #warning Incomplete implementation, return the number of rows
-        return toDoCategories.count
+        return toDoCategories?.count ?? 1
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -38,7 +50,7 @@ class CategoryViewController: UITableViewController {
         // Get cell config
         var cellConfig = cell.defaultContentConfiguration()
         // update cell config
-        cellConfig.text = toDoCategories[indexPath.row].name
+        cellConfig.text = toDoCategories?[indexPath.row].name ?? "No categories added"
         cellConfig.textProperties.color = UIColor.green
         cellConfig.textProperties.font = UIFont.systemFont(ofSize: 25)
         // apply cell config
@@ -60,7 +72,7 @@ class CategoryViewController: UITableViewController {
         if segue.identifier == "GoToItems"{
             if let itemListVC = segue.destination as? ToDoListViewController{
                 if let index = tableView.indexPathForSelectedRow{
-                    itemListVC.selectedCategory = toDoCategories[index.row]
+                    itemListVC.selectedCategory = toDoCategories?[index.row]
                 }
             }
         }
@@ -74,10 +86,9 @@ class CategoryViewController: UITableViewController {
         let addAlertAction = UIAlertAction(title: "Add", style: UIAlertAction.Style.default) { (action) in
             
             if let newCategoryName = alertController.textFields?.first?.text {
-                let newCategoryItem = CategoryItem(context: self.context)
+                let newCategoryItem = CategoryItemRlm()
                 newCategoryItem.name = newCategoryName
-                self.toDoCategories.append(newCategoryItem)
-                self.saveData()
+                self.saveData(category: newCategoryItem)
             }
         }
         alertController.addTextField()
@@ -87,18 +98,21 @@ class CategoryViewController: UITableViewController {
         self.present(alertController, animated: true)
     }
     
+
     //MARK: - CRUD operations to CoreData
-    func loadData(request:  NSFetchRequest<CategoryItem> = CategoryItem.fetchRequest()){
-        do{
-            toDoCategories = try context.fetch(request)
-        } catch {
-            print("Error while loading data from context - \(error)")
-        }
+    func loadData(){
+        // We are linking all objects of certain type to toDoCategories varaible.
+        // This variable is auto updated every time there is change in Category objects
+        toDoCategories = realm.objects(CategoryItemRlm.self)
+        tableView.reloadData()
     }
     
-    func saveData(){
+    // takes input as one category item and saves it to Realm DB
+    func saveData(category: CategoryItemRlm){
         do{
-            try context.save()
+            try realm.write({
+                realm.add(category, update: Realm.UpdatePolicy.error)
+            })
             tableView.reloadData()
         } catch {
             print("Error while saving context - \(error)")

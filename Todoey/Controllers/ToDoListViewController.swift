@@ -6,15 +6,19 @@
 //
 
 import UIKit
-import CoreData
+import RealmSwift
 
 class ToDoListViewController: UITableViewController{
 
     
-    var toDoList = [ToDoItem]()
-    let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
+    let realm = try! Realm()
+    var toDoList : Results<ToDoItemRlm>?
     
-    var selectedCategory: CategoryItem? {
+    // We use context to perform CRUD operatioon on CoreData entities
+    // let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
+    
+    // this is the category selected in Category list VC
+    var selectedCategory: CategoryItemRlm? {
         didSet{
             // this block is executed when variable is set with value
             loadData()
@@ -33,7 +37,7 @@ class ToDoListViewController: UITableViewController{
         super.viewDidLoad()
         
         //Print the path to documents folder
-        print(FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!)
+        // print(FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!)
                 
         // Reading UserDefaults file
         /*
@@ -53,7 +57,7 @@ class ToDoListViewController: UITableViewController{
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         // return the number of rows in a given section
         // print("\(toDoList.count) rows in section \(section)")
-        return toDoList.count
+        return toDoList?.count ?? 0
     }
     
     
@@ -67,32 +71,40 @@ class ToDoListViewController: UITableViewController{
         var contentConfig = cell.defaultContentConfiguration()
         
         // Update details in configuration
-        contentConfig.text = toDoList[indexPath.row].title
+        contentConfig.text = toDoList?[indexPath.row].title ?? "No items created"
         contentConfig.textProperties.color = UIColor.red
         contentConfig.textProperties.font = UIFont.systemFont(ofSize: 20)
         
         // Apply updated configuration back to cell
         cell.contentConfiguration = contentConfig
         
-        cell.accessoryType = (toDoList[indexPath.row].done) ? UITableViewCell.AccessoryType.checkmark : UITableViewCell.AccessoryType.none
+        cell.accessoryType = (toDoList?[indexPath.row].done ?? false) ? UITableViewCell.AccessoryType.checkmark : UITableViewCell.AccessoryType.none
 
         return cell
     }
     
+    
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        print("user selected \(toDoList[indexPath.row].title ?? "") with done: \(toDoList[indexPath.row].done)")
+        // Print the row selected
+        print("user selected \(toDoList?[indexPath.row].title ?? "") with done: \(String(describing: toDoList?[indexPath.row].done))")
+        // deselect the row
         tableView.deselectRow(at: indexPath, animated: true)
         
-        // you can change the value of a property by using setvalue method
-        toDoList[indexPath.row].setValue(!(toDoList[indexPath.row].done), forKey: "done")
-        // you can directly access the property of the entiy and update its value
-        // toDoList[indexPath.row].done = !(toDoList[indexPath.row].done)
-        
-        tableView.cellForRow(at: indexPath)?.accessoryType = toDoList[indexPath.row].done ? UITableViewCell.AccessoryType.checkmark : UITableViewCell.AccessoryType.none
-        
-        saveItem()
-        // tableView.reloadRows(at: [indexPath], with: UITableView.RowAnimation.automatic)
+        if let item = toDoList?[indexPath.row]{
+            do{
+                try realm.write({
+                    // below line updated a bool property in our calss
+                    item.done = !item.done
+                    // below link is used to delete an item from Realm DB
+                    // realm.delete(item)
+                })
+                tableView.reloadData()
+            } catch {
+                print("Error while updating Realm DB - \(error)")
+            }
+        }
     }
+     
     
     //MARK: - Show pop-up for user to enter new item
     @IBAction func addItemPressed(_ sender: UIBarButtonItem) {
@@ -108,25 +120,15 @@ class ToDoListViewController: UITableViewController{
             // We are able to access the textField because it is a class ref variable and not local to the closure
             if let newToDoItem = textField.text, newToDoItem != ""{
 
-                // create new item to be stored in CoreData Entity
-                // The Entity is same as table and is represented by a class.
-                // The class is subclassed from NSManagedObject
-                // each row in Entity / Table is an instance of the class
-                let newItem = ToDoItem(context: self.context)
+                // Create a new instance of ToDoItemRLM object
+                let newItem = ToDoItemRlm()
                 // set the complete flag
                 newItem.done = false
                 // set the title
                 newItem.title = newToDoItem
-                // set the foreign key column
-                newItem.parentCategory = self.selectedCategory
-                self.toDoList.append(newItem)
-                
-                // Add new Item to array
-                // self.toDoList?.add(title: newToDoItem)
-                
                 // Save the array in the user defaults plist against a key
                 // self.userDefaults.set(self.toDoList?.items, forKey: "ToDoList")
-                self.saveItem()
+                self.saveItem(item: newItem)
             }
         }
         let cancel = UIAlertAction(title: "Cancel", style: UIAlertAction.Style.cancel)
@@ -143,7 +145,42 @@ class ToDoListViewController: UITableViewController{
         // Present alert VC
         present(alert, animated: true)
     }
+    
+    // load data for Realm DB
+    func loadData() -> Void {
+        
+        toDoList = selectedCategory?.toDoItems.sorted(byKeyPath: "dateCreated", ascending: false)
+        tableView.reloadData()
+    }
+    
+    // Save data for Realm DB
+    func saveItem(item: ToDoItemRlm) -> Void {
+        
+        if let currentCategory = selectedCategory{
+            do{
+                try realm.write {
+                    currentCategory.toDoItems.append(item)
+                }
+            } catch {
+                print("Error while saving to Realm DB - \(error)")
+            }
 
+        }
+        tableView.reloadData()
+    }
+    
+    func updateData(item: ToDoItemRlm) -> Void {
+        do{
+            try realm.write {
+                item
+            }
+        } catch {
+            print("Error while updating Realm DB - \(error)")
+        }
+        tableView.reloadData()
+    }
+
+    /* below function used in CoreData
     func saveItem() -> Void {
         do{
             try context.save()
@@ -156,6 +193,7 @@ class ToDoListViewController: UITableViewController{
         self.tableView.reloadData()
     }
 
+    
     func loadData(request: NSFetchRequest<ToDoItem> = ToDoItem.fetchRequest(), predicate: NSPredicate? = nil) -> Void {
         do{
             // Create a default predicate
@@ -183,6 +221,7 @@ class ToDoListViewController: UITableViewController{
         // We need to commit the changes to Context by saving the changes
         saveItem()
     }
+     */
     
     /* used for saving data using encoder
     func saveItem() -> Void {
@@ -224,17 +263,10 @@ class ToDoListViewController: UITableViewController{
 extension ToDoListViewController: UISearchBarDelegate{
     
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
-        
-        // Add where condition / filters
-        let predicate = NSPredicate(format: "title CONTAINS[cd] %@", searchBar.text!)
-        // add sorting condition for result
-        // let sortDescriptor = NSSortDescriptor(key: "title", ascending: true)
-        // request.sortDescriptors = [sortDescriptor]
-        
-        loadData(predicate: predicate)
-        tableView.reloadData()
-
+        // Below linr first filters the list based on filter predicate and then sorts the result based on column
+        toDoList = toDoList?.filter("title CONTAINS[cd] %@", searchBar.text ?? "").sorted(byKeyPath: "dateCreated", ascending: false)
         print(searchBar.text!)
+        tableView.reloadData()
     }
     
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {

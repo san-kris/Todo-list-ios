@@ -17,6 +17,10 @@
 		AA6CDD05297E017600781763 /* ToDoListItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA6CDD04297E017600781763 /* ToDoListItem.swift */; };
 		AA6CDD07297E020B00781763 /* ToDoList.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA6CDD06297E020B00781763 /* ToDoList.swift */; };
 		AA6CDD0D29806F4600781763 /* CategoryViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA6CDD0C29806F4600781763 /* CategoryViewController.swift */; };
+		AA6CDD102980B82100781763 /* Realm in Frameworks */ = {isa = PBXBuildFile; productRef = AA6CDD0F2980B82100781763 /* Realm */; };
+		AA6CDD122980B82100781763 /* RealmSwift in Frameworks */ = {isa = PBXBuildFile; productRef = AA6CDD112980B82100781763 /* RealmSwift */; };
+		AA6CDD14298158DB00781763 /* CategoryItemRlm.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA6CDD13298158DB00781763 /* CategoryItemRlm.swift */; };
+		AA6CDD162981591300781763 /* ToDoItemRlm.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA6CDD152981591300781763 /* ToDoItemRlm.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -32,6 +36,8 @@
 		AA6CDD04297E017600781763 /* ToDoListItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToDoListItem.swift; sourceTree = "<group>"; };
 		AA6CDD06297E020B00781763 /* ToDoList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToDoList.swift; sourceTree = "<group>"; };
 		AA6CDD0C29806F4600781763 /* CategoryViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryViewController.swift; sourceTree = "<group>"; };
+		AA6CDD13298158DB00781763 /* CategoryItemRlm.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryItemRlm.swift; sourceTree = "<group>"; };
+		AA6CDD152981591300781763 /* ToDoItemRlm.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToDoItemRlm.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -39,6 +45,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				AA6CDD122980B82100781763 /* RealmSwift in Frameworks */,
+				AA6CDD102980B82100781763 /* Realm in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -99,6 +107,8 @@
 				AA6CDCEF297C8C8F00781763 /* Todoey.xcdatamodeld */,
 				AA6CDD04297E017600781763 /* ToDoListItem.swift */,
 				AA6CDD06297E020B00781763 /* ToDoList.swift */,
+				AA6CDD13298158DB00781763 /* CategoryItemRlm.swift */,
+				AA6CDD152981591300781763 /* ToDoItemRlm.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -119,6 +129,10 @@
 			dependencies = (
 			);
 			name = Todoey;
+			packageProductDependencies = (
+				AA6CDD0F2980B82100781763 /* Realm */,
+				AA6CDD112980B82100781763 /* RealmSwift */,
+			);
 			productName = Todoey;
 			productReference = AA6CDCE3297C8C8F00781763 /* Todoey.app */;
 			productType = "com.apple.product-type.application";
@@ -147,6 +161,9 @@
 				Base,
 			);
 			mainGroup = AA6CDCDA297C8C8F00781763;
+			packageReferences = (
+				AA6CDD0E2980B82100781763 /* XCRemoteSwiftPackageReference "realm-swift" */,
+			);
 			productRefGroup = AA6CDCE4297C8C8F00781763 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -174,7 +191,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				AA6CDD14298158DB00781763 /* CategoryItemRlm.swift in Sources */,
 				AA6CDD01297C8EBC00781763 /* ToDoListViewController.swift in Sources */,
+				AA6CDD162981591300781763 /* ToDoItemRlm.swift in Sources */,
 				AA6CDD05297E017600781763 /* ToDoListItem.swift in Sources */,
 				AA6CDD07297E020B00781763 /* ToDoList.swift in Sources */,
 				AA6CDD0D29806F4600781763 /* CategoryViewController.swift in Sources */,
@@ -398,6 +417,30 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		AA6CDD0E2980B82100781763 /* XCRemoteSwiftPackageReference "realm-swift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/realm/realm-swift.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 10.34.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		AA6CDD0F2980B82100781763 /* Realm */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = AA6CDD0E2980B82100781763 /* XCRemoteSwiftPackageReference "realm-swift" */;
+			productName = Realm;
+		};
+		AA6CDD112980B82100781763 /* RealmSwift */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = AA6CDD0E2980B82100781763 /* XCRemoteSwiftPackageReference "realm-swift" */;
+			productName = RealmSwift;
+		};
+/* End XCSwiftPackageProductDependency section */
 
 /* Begin XCVersionGroup section */
 		AA6CDCEF297C8C8F00781763 /* Todoey.xcdatamodeld */ = {

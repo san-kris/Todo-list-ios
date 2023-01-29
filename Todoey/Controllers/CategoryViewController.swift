@@ -98,7 +98,69 @@ class CategoryViewController: UITableViewController {
         self.present(alertController, animated: true)
     }
     
+    //MARK: - Cell Swipe Action Configuration
+    // Below delegate method will be called when swiping cell from left to right
+    override func tableView(_ tableView: UITableView, leadingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
+        // create a action to display when user swipes a cell with name and style
+        // add a action handler closure to handle the action.
+        // Call completionHandler function when actoin completes
+        let action = UIContextualAction(style: .normal, title: "Favorite") { (action, view, completionHandler) in
+            self.handleMarkAsFavourite()
+            completionHandler(true)
+        }
+        // change the background color of the action
+        action.backgroundColor = .systemBlue
+        // add one or more actions to the configuration object and return it
+        return UISwipeActionsConfiguration(actions: [action])
+    }
+    
+    // Below delegate method will be called when swiping cell from right to left
+    override func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
+        // create a action to display when user swipes a cell with name and style
+        // add a action handler closure to handle the action.
+        // Call completionHandler function when actoin completes
+        
+        // add delete acton on swipe
+        let deleteAction = UIContextualAction(style: .normal, title: "Delete") { (action, view, completionHandler) in
+            self.handleMoveToTrash()
+            completionHandler(true)
+        }
+        // change the background color of the action
+        deleteAction.backgroundColor = .systemRed
+        
+        // add Alarm acton on swipe
+        let alarmAction = UIContextualAction(style: .normal, title: "Alarm") { (action, view, completionHandler) in
+            self.handleSetAlarm()
+            completionHandler(true)
+        }
+        // change the background color of the action
+        alarmAction.backgroundColor = .systemYellow
+        // add one or more actions to the configuration object and return it
+        return UISwipeActionsConfiguration(actions: [deleteAction, alarmAction])
+    }
+    
+    // Pervious to IOS 13, swiping right to left on cell automaticaly showed Delete option
+    // To prevent this from happening use below code
+//    override func tableView(_ tableView: UITableView, editingStyleForRowAt indexPath: IndexPath) -> UITableViewCell.EditingStyle {
+//        return .none
+//    }
+    
+    private func handleMarkAsFavourite() {
+        print("Marked as favourite")
+    }
 
+    private func handleMarkAsUnread() {
+        print("Marked as unread")
+    }
+
+    private func handleMoveToTrash() {
+        print("Moved to trash")
+    }
+
+    private func handleSetAlarm() {
+        print("Set the alarm")
+    }
+    
     //MARK: - CRUD operations to CoreData
     func loadData(){
         // We are linking all objects of certain type to toDoCategories varaible.
